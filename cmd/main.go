@@ -3,7 +3,7 @@ package main
 import (
 	"engebretsen/simple_web_svc/models"
 	"engebretsen/simple_web_svc/pkg/common/db"
-	"engebretsen/simple_web_svc/pkg/users"
+	"engebretsen/simple_web_svc/pkg/controllers"
 	"log"
 	"os"
 	"strconv"
@@ -28,6 +28,6 @@ func main() {
 
 	router := gin.Default()
 
-	users.RegisterRoutes(router, models.UserModel{DB: database})
+	controllers.RegisterRoutes(router, models.UserModel{DB: database})
 	router.Run("localhost: 8080")
 }

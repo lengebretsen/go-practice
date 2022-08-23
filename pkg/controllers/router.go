@@ -1,4 +1,4 @@
-package users
+package controllers
 
 import (
 	"engebretsen/simple_web_svc/models"
