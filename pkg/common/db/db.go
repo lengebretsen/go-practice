@@ -9,8 +9,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-var DB *sql.DB
-
 // TODO - Externalize config
 var dbName = "go-practice"
 var dbUser = "gousr"
