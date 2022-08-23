@@ -19,6 +19,14 @@ type UserModel struct {
 	DB *sql.DB
 }
 
+type UserRepository interface {
+	SelectAllUsers() ([]User, error)
+	SelectOneUser(id uuid.UUID) (User, error)
+	InsertUser(usr User) (User, error)
+	UpdateUser(usr User) (User, error)
+	DeleteUser(id uuid.UUID) error
+}
+
 type ErrUserNotFound struct {
 	Id uuid.UUID
 }

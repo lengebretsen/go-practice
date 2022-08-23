@@ -4,20 +4,14 @@ import (
 	"engebretsen/simple_web_svc/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type handler struct {
-	users interface {
-		SelectAllUsers() ([]models.User, error)
-		SelectOneUser(id uuid.UUID) (models.User, error)
-		InsertUser(usr models.User) (models.User, error)
-		UpdateUser(usr models.User) (models.User, error)
-		DeleteUser(id uuid.UUID) error
-	}
+	users models.UserRepository
 }
 
-func RegisterRoutes(r *gin.Engine, users models.UserModel) {
+// RegisterRoutes initializes the routes and sets up the handler's reference to the model(s) for database access
+func RegisterRoutes(r *gin.Engine, users models.UserRepository) {
 	h := &handler{
 		users: users,
 	}
