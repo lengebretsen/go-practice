@@ -24,8 +24,12 @@ func RegisterRoutes(r *gin.Engine, users models.UserRepository, addresses models
 	userRoutes.GET("/:id", h.FetchUser)
 	userRoutes.PUT("/:id", h.UpdateUser)
 	userRoutes.DELETE("/:id", h.DeleteUser)
+	userRoutes.GET("/:id/addresses", h.FetchAddressesForUser)
 
 	addressRoutes := r.Group("/addresses")
 	addressRoutes.POST("/", h.AddAddress)
 	addressRoutes.GET("/", h.FetchAddresses)
+	addressRoutes.GET("/:id", h.FetchAddress)
+	addressRoutes.PUT("/:id", h.UpdateAddress)
+	addressRoutes.DELETE("/:id", h.DeleteAddress)
 }

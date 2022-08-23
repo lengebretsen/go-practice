@@ -27,14 +27,6 @@ type UserRepository interface {
 	DeleteUser(id uuid.UUID) error
 }
 
-type ErrUserNotFound struct {
-	Id uuid.UUID
-}
-
-func (e *ErrUserNotFound) Error() string {
-	return fmt.Sprintf("User with Id [%d] does not exist.", e.Id)
-}
-
 func (m UserModel) SelectAllUsers() ([]User, error) {
 	var users []User = make([]User, 0)
 	rows, err := m.DB.Query("SELECT * FROM users")
@@ -63,7 +55,7 @@ func (m UserModel) SelectOneUser(id uuid.UUID) (User, error) {
 	err := row.Scan(&user.Id, &user.FirstName, &user.LastName)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user, &ErrUserNotFound{Id: id}
+			return user, &ErrModelNotFound{ModelName: "User", Id: id}
 		}
 		return user, err
 	}
@@ -95,7 +87,7 @@ func (m UserModel) UpdateUser(usr User) (User, error) {
 		return User{}, err
 	}
 	if count == 0 {
-		return User{}, &ErrUserNotFound{Id: usr.Id}
+		return User{}, &ErrModelNotFound{ModelName: "User", Id: usr.Id}
 	}
 	return usr, err
 }
@@ -127,7 +119,7 @@ func (m UserModel) DeleteUser(id uuid.UUID) error {
 	}
 	if rows == 0 {
 		tx.Rollback()
-		return &ErrUserNotFound{Id: id}
+		return &ErrModelNotFound{ModelName: "User", Id: id}
 	}
 
 	//Commit transaction
