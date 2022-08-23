@@ -19,3 +19,5 @@
 .vscode/configurationCache.log
 
 .vscode/settings.json
+
+GINSVR.pid
