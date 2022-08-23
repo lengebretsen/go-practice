@@ -28,6 +28,6 @@ func main() {
 
 	router := gin.Default()
 
-	controllers.RegisterRoutes(router, models.UserModel{DB: database})
+	controllers.RegisterRoutes(router, models.UserModel{DB: database}, models.AddressModel{DB: database})
 	router.Run("localhost: 8080")
 }

@@ -82,8 +82,6 @@ func (m UserModel) InsertUser(usr User) (User, error) {
 	if count != 1 {
 		return User{}, errors.New(fmt.Sprintf("Invalid number of rows written: %d", count))
 	}
-	println(fmt.Sprintf("Inserted %d new user record w/ Id: %v", count, usr))
-
 	return usr, err
 }
 
