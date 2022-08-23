@@ -1,11 +1,13 @@
 
 up: gin-up
 	
-
 down: gin-down docker-down
+
+bounce: gin-down gin-up
 
 
 gin-up: docker-up
+	sleep 2
 	go run cmd/main.go & 
 
 gin-down:
