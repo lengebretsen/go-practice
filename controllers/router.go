@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"github.com/lengebretsen/go-practice/models"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,6 +11,18 @@ import (
 type handler struct {
 	users     models.UserRepository
 	addresses models.AddressRepository
+}
+
+func SetupRouter() *gin.Engine {
+	r := gin.Default()
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.String(200, "pong")
+	})
+	// docs route
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	return r
 }
 
 // RegisterRoutes initializes the routes and sets up the handler's reference to the model(s) for database access

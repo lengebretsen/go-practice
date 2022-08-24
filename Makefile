@@ -5,6 +5,9 @@ down: gin-down docker-down
 
 bounce: gin-down gin-up
 
+test:
+	go test -v ./...
+
 gin-up:
 	go run main.go & 
 
