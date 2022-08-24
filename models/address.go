@@ -100,7 +100,7 @@ func (m AddressModel) InsertAddress(addr Address) (Address, error) {
 
 func (m AddressModel) UpdateAddress(addr Address) (Address, error) {
 	result, err := m.DB.Exec(
-		"UPDATE address set UserId = UUID_TO_BIN(?), Street = ?, City = ?, State = ?, Zip = ?, Type = ? WHERE Id = UUID_TO_BIN(?)",
+		"UPDATE addresses set UserId = UUID_TO_BIN(?), Street = ?, City = ?, State = ?, Zip = ?, Type = ? WHERE Id = UUID_TO_BIN(?)",
 		addr.UserId,
 		addr.State,
 		addr.City,
