@@ -14,13 +14,13 @@ gin-down:
 
 docker-up: 
 	docker-compose -f docker-compose.yml up -d
-	sleep 2
+	sleep 3
 
 docker-down:
 	docker-compose -f docker-compose.yml down
 
 clean-db:
-	docker volume rm  simple_web_svc_db
+	docker volume rm  go-practice_db
 
 update-swagger:
 	swag init
