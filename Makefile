@@ -1,12 +1,11 @@
 
-up: gin-up
+up: docker-up gin-up
 	
 down: gin-down docker-down
 
 bounce: gin-down gin-up
 
-gin-up: docker-up
-	sleep 2
+gin-up: 
 	go run main.go & 
 
 gin-down:
@@ -15,6 +14,7 @@ gin-down:
 
 docker-up: 
 	docker-compose -f docker-compose.yml up -d
+	sleep 2
 
 docker-down:
 	docker-compose -f docker-compose.yml down
