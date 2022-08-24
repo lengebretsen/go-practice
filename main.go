@@ -1,16 +1,17 @@
 package main
 
 import (
-	"engebretsen/simple_web_svc/conf"
-	"engebretsen/simple_web_svc/models"
-	"engebretsen/simple_web_svc/pkg/common/db"
-	"engebretsen/simple_web_svc/pkg/controllers"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
 
-	_ "engebretsen/simple_web_svc/docs"
+	"github.com/lengebretsen/go-practice/conf"
+	"github.com/lengebretsen/go-practice/models"
+	"github.com/lengebretsen/go-practice/pkg/common/db"
+	"github.com/lengebretsen/go-practice/pkg/controllers"
+
+	_ "github.com/lengebretsen/go-practice/docs"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"

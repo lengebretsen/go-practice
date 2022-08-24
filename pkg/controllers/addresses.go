@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"engebretsen/simple_web_svc/models"
-	"engebretsen/simple_web_svc/pkg/common"
 	"fmt"
 	"net/http"
+
+	"github.com/lengebretsen/go-practice/models"
+	"github.com/lengebretsen/go-practice/pkg/common"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

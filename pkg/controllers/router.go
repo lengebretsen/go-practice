@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"engebretsen/simple_web_svc/models"
+	"github.com/lengebretsen/go-practice/models"
 
 	"github.com/gin-gonic/gin"
 )
