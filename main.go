@@ -1,9 +1,11 @@
 package main
 
 import (
+	"engebretsen/simple_web_svc/conf"
 	"engebretsen/simple_web_svc/models"
 	"engebretsen/simple_web_svc/pkg/common/db"
 	"engebretsen/simple_web_svc/pkg/controllers"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -25,6 +28,8 @@ import (
 // @query.collection.format multi
 
 func main() {
+	conf.LoadConfig() //Load viper config
+
 	database, err := db.Init()
 	if err != nil {
 		log.Fatal("Failed to initialize database")
@@ -44,5 +49,5 @@ func main() {
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	controllers.RegisterRoutes(router, models.UserModel{DB: database}, models.AddressModel{DB: database})
-	router.Run("localhost: 8080")
+	router.Run(fmt.Sprintf("%s:%s", viper.Get("server.host"), viper.Get("server.port")))
 }

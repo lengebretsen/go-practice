@@ -7,21 +7,16 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 )
-
-// TODO - Externalize config
-var dbName = "go-practice"
-var dbUser = "gousr"
-var dbPass = "gopass"
-var dbAddr = "127.0.0.1:3306"
 
 func Init() (*sql.DB, error) {
 	cfg := mysql.Config{
-		User:   dbUser,
-		Passwd: dbPass,
+		User:   viper.GetString("database.user"),
+		Passwd: viper.GetString("database.pass"),
 		Net:    "tcp",
-		Addr:   dbAddr,
-		DBName: dbName,
+		Addr:   fmt.Sprintf("%s:%s", viper.GetString("database.host"), viper.GetString("database.port")),
+		DBName: viper.GetString("database.name"),
 	}
 	var err error
 	db, err := sql.Open("mysql", cfg.FormatDSN())
@@ -37,6 +32,5 @@ func Init() (*sql.DB, error) {
 	if pingErr != nil {
 		log.Fatal(pingErr)
 	}
-	fmt.Println("Connected to DB!")
 	return db, err
 }
