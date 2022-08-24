@@ -5,10 +5,9 @@ down: gin-down docker-down
 
 bounce: gin-down gin-up
 
-
 gin-up: docker-up
 	sleep 2
-	go run cmd/main.go & 
+	go run main.go & 
 
 gin-down:
 	pkill -l -F ./GINSVR.pid
@@ -22,3 +21,6 @@ docker-down:
 
 clean-db:
 	docker volume rm  simple_web_svc_db
+
+update-swagger:
+	swag init

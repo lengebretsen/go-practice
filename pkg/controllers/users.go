@@ -10,12 +10,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type AddUpdateUserBody struct {
+type addUpdateUserBody struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 }
 
 // FetchUsers retrieves a list of all users in the system
+// @Summary retrieve a list of all users in the system
+// @ID fetch-all-users
+// @Produce json
+// @Success 200 {object} models.User
+// @Router /users [get]
 func (h handler) FetchUsers(c *gin.Context) {
 	users, err := h.users.SelectAllUsers()
 	if err != nil {
@@ -26,6 +31,14 @@ func (h handler) FetchUsers(c *gin.Context) {
 }
 
 // FetchUser retrieves a single user by id
+// @Summary retrieve a user by Id
+// @ID fetch-user
+// @Produce json
+// @Param id path string true "user ID"
+// @Success 200 {object} models.User
+// @Failure 400 {object} common.ApiError
+// @Failure 404 {object} common.ApiError
+// @Router /users/{id} [get]
 func (h handler) FetchUser(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
@@ -49,8 +62,15 @@ func (h handler) FetchUser(c *gin.Context) {
 }
 
 // AddUser stores a new user
+// @Summary add a new user
+// @ID add-user
+// @Produce json
+// @Param data body addUpdateUserBody true "new user data"
+// @Success 200 {object} models.User
+// @Failure 400 {object} common.ApiError
+// @Router /users [post]
 func (h handler) AddUser(c *gin.Context) {
-	var reqBody AddUpdateUserBody
+	var reqBody addUpdateUserBody
 
 	if err := c.BindJSON(&reqBody); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: "Invalid request body.", Error: err})
@@ -66,8 +86,17 @@ func (h handler) AddUser(c *gin.Context) {
 }
 
 // UpdateUser modifies an existing user
+// @Summary modify an existing user
+// @ID update-user
+// @Produce json
+// @Param id path string true "user ID"
+// @Param data body addUpdateUserBody true "new user data"
+// @Success 200 {object} models.User
+// @Failure 400 {object} common.ApiError
+// @Failure 404 {object} common.ApiError
+// @Router /users/{id} [put]
 func (h handler) UpdateUser(c *gin.Context) {
-	var reqBody AddUpdateUserBody
+	var reqBody addUpdateUserBody
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
@@ -96,6 +125,13 @@ func (h handler) UpdateUser(c *gin.Context) {
 }
 
 // DeleteUser deletes an existing user, including any addresses associated with the user
+// @Summary delete a user by Id, including any addresses associated with the user
+// @ID delete-user
+// @Param id path string true "user ID"
+// @Success 204
+// @Failure 400 {object} common.ApiError
+// @Failure 404 {object} common.ApiError
+// @Router /users/{id} [delete]
 func (h handler) DeleteUser(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)

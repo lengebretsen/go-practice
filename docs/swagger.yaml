@@ -1,0 +1,140 @@
+basePath: /
+definitions:
+  common.ApiError:
+    properties:
+      error: {}
+      message:
+        type: string
+    type: object
+  controllers.addUpdateUserBody:
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+    type: object
+  models.User:
+    properties:
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A small go/gin web app providing a simple REST API for managing users
+    and addresses
+  title: Go + Gin API Practice
+  version: "1.0"
+paths:
+  /users:
+    get:
+      operationId: fetch-all-users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: retrieve a list of all users in the system
+    post:
+      operationId: add-user
+      parameters:
+      - description: new user data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.addUpdateUserBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: add a new user
+  /users/{id}:
+    delete:
+      operationId: delete-user
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: delete a user by Id, including any addresses associated with the user
+    get:
+      operationId: fetch-user
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: retrieve a user by Id
+    put:
+      operationId: update-user
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: new user data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.addUpdateUserBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: modify an existing user
+swagger: "2.0"

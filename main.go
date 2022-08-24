@@ -8,9 +8,21 @@ import (
 	"os"
 	"strconv"
 
+	_ "engebretsen/simple_web_svc/docs"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title Go + Gin API Practice
+// @version 1.0
+// @description A small go/gin web app providing a simple REST API for managing users and addresses
+
+// @host localhost:8080
+// @BasePath /
+// @query.collection.format multi
 
 func main() {
 	database, err := db.Init()
@@ -27,6 +39,9 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	// docs route
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	controllers.RegisterRoutes(router, models.UserModel{DB: database}, models.AddressModel{DB: database})
 	router.Run("localhost: 8080")
