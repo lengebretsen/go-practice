@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/lengebretsen/go-practice/models"
-	"github.com/lengebretsen/go-practice/pkg/common"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -30,7 +29,7 @@ type addUpdateAddressBody struct {
 func (h handler) FetchAddresses(c *gin.Context) {
 	addrs, err := h.addresses.FetchAddresses()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: "Error fetching address records", Error: err})
+		c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: "Error fetching address records", Error: err})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, addrs)
@@ -43,14 +42,14 @@ func (h handler) FetchAddresses(c *gin.Context) {
 // @Produce json
 // @Param id path string true "address ID"
 // @Success 200 {object} models.Address
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /addresses/{id} [get]
 func (h handler) FetchAddress(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
@@ -58,10 +57,10 @@ func (h handler) FetchAddress(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error fetching address record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching address record with Id [%s]", id), Error: err})
 			return
 		}
 	}
@@ -75,14 +74,14 @@ func (h handler) FetchAddress(c *gin.Context) {
 // @Produce json
 // @Param id path string true "user ID"
 // @Success 200 {object} []models.Address
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /users/{id}/addresses [get]
 func (h handler) FetchAddressesForUser(c *gin.Context) {
 	idParam := c.Param("id")
 	userId, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
@@ -91,17 +90,17 @@ func (h handler) FetchAddressesForUser(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error fetching addresses for user with Id [%s]", idParam), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching addresses for user with Id [%s]", idParam), Error: err})
 			return
 		}
 	}
 
 	addrs, err := h.addresses.FindAddressesByUserId(userId)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error fetching address records for user [%s]", idParam), Error: err})
+		c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching address records for user [%s]", idParam), Error: err})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, addrs)
@@ -114,13 +113,13 @@ func (h handler) FetchAddressesForUser(c *gin.Context) {
 // @Produce json
 // @Param data body addUpdateAddressBody true "new address data"
 // @Success 200 {object} []models.Address
-// @Failure 400 {object} common.ApiError
+// @Failure 400 {object} ApiError
 // @Router /addresses [post]
 func (h handler) AddAddress(c *gin.Context) {
 	var reqBody addUpdateAddressBody
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: "Invalid request body.", Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
 	}
 	newAddr, err := h.addresses.InsertAddress(models.Address{
@@ -133,7 +132,7 @@ func (h handler) AddAddress(c *gin.Context) {
 		Type:   reqBody.Type,
 	})
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: "Error creating new address", Error: err})
+		c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: "Error creating new address", Error: err})
 		return
 	}
 
@@ -148,20 +147,20 @@ func (h handler) AddAddress(c *gin.Context) {
 // @Param id path string true "address ID"
 // @Param data body addUpdateAddressBody true "updated address data"
 // @Success 200 {object} []models.Address
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /addresses/{id} [put]
 func (h handler) UpdateAddress(c *gin.Context) {
 	var reqBody addUpdateAddressBody
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: "Invalid request body.", Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
 	}
 
@@ -171,10 +170,10 @@ func (h handler) UpdateAddress(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error updating address record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error updating address record with Id [%s]", id), Error: err})
 			return
 		}
 	}
@@ -189,14 +188,14 @@ func (h handler) UpdateAddress(c *gin.Context) {
 // @Produce json
 // @Param id path string true "address ID"
 // @Success 204
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /addresses/{id} [delete]
 func (h handler) DeleteAddress(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
@@ -204,10 +203,10 @@ func (h handler) DeleteAddress(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error deleting address record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error deleting address record with Id [%s]", id), Error: err})
 			return
 		}
 	}

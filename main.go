@@ -7,9 +7,9 @@ import (
 	"strconv"
 
 	"github.com/lengebretsen/go-practice/conf"
+	"github.com/lengebretsen/go-practice/controllers"
+	"github.com/lengebretsen/go-practice/db"
 	"github.com/lengebretsen/go-practice/models"
-	"github.com/lengebretsen/go-practice/pkg/common/db"
-	"github.com/lengebretsen/go-practice/pkg/controllers"
 
 	_ "github.com/lengebretsen/go-practice/docs"
 

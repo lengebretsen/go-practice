@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/lengebretsen/go-practice/models"
-	"github.com/lengebretsen/go-practice/pkg/common"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -26,7 +25,7 @@ type addUpdateUserBody struct {
 func (h handler) FetchUsers(c *gin.Context) {
 	users, err := h.users.SelectAllUsers()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: "Error fetching user records", Error: err})
+		c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: "Error fetching user records", Error: err})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, users)
@@ -39,14 +38,14 @@ func (h handler) FetchUsers(c *gin.Context) {
 // @Produce json
 // @Param id path string true "user ID"
 // @Success 200 {object} models.User
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /users/{id} [get]
 func (h handler) FetchUser(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
@@ -54,10 +53,10 @@ func (h handler) FetchUser(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error fetching user record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching user record with Id [%s]", id), Error: err})
 			return
 		}
 	}
@@ -71,18 +70,18 @@ func (h handler) FetchUser(c *gin.Context) {
 // @Produce json
 // @Param data body addUpdateUserBody true "new user data"
 // @Success 200 {object} models.User
-// @Failure 400 {object} common.ApiError
+// @Failure 400 {object} ApiError
 // @Router /users [post]
 func (h handler) AddUser(c *gin.Context) {
 	var reqBody addUpdateUserBody
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: "Invalid request body.", Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
 	}
 	newUser, err := h.users.InsertUser(models.User{Id: uuid.New(), FirstName: reqBody.FirstName, LastName: reqBody.LastName})
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: "Error creating new user", Error: err})
+		c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: "Error creating new user", Error: err})
 		return
 	}
 
@@ -97,20 +96,20 @@ func (h handler) AddUser(c *gin.Context) {
 // @Param id path string true "user ID"
 // @Param data body addUpdateUserBody true "new user data"
 // @Success 200 {object} models.User
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /users/{id} [put]
 func (h handler) UpdateUser(c *gin.Context) {
 	var reqBody addUpdateUserBody
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: "Invalid request body.", Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
 	}
 
@@ -118,10 +117,10 @@ func (h handler) UpdateUser(c *gin.Context) {
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error updating user record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error updating user record with Id [%s]", id), Error: err})
 			return
 		}
 	}
@@ -135,24 +134,24 @@ func (h handler) UpdateUser(c *gin.Context) {
 // @ID delete-user
 // @Param id path string true "user ID"
 // @Success 204
-// @Failure 400 {object} common.ApiError
-// @Failure 404 {object} common.ApiError
+// @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /users/{id} [delete]
 func (h handler) DeleteUser(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, common.ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
+		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: fmt.Sprintf("Id [%s] is not a valid UUID", idParam), Error: err})
 		return
 	}
 	err = h.users.DeleteUser(id)
 	if err != nil {
 		switch e := err.(type) {
 		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, common.ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
 			return
 		default:
-			c.IndentedJSON(http.StatusInternalServerError, common.ApiError{Message: fmt.Sprintf("Error deleting user record with Id [%s]", id), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error deleting user record with Id [%s]", id), Error: err})
 			return
 		}
 	}
