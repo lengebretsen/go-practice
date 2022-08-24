@@ -17,9 +17,10 @@ type addUpdateUserBody struct {
 
 // FetchUsers retrieves a list of all users in the system
 // @Summary retrieve a list of all users in the system
+// @Tags users
 // @ID fetch-all-users
 // @Produce json
-// @Success 200 {object} models.User
+// @Success 200 {object} []models.User
 // @Router /users [get]
 func (h handler) FetchUsers(c *gin.Context) {
 	users, err := h.users.SelectAllUsers()
@@ -32,6 +33,7 @@ func (h handler) FetchUsers(c *gin.Context) {
 
 // FetchUser retrieves a single user by id
 // @Summary retrieve a user by Id
+// @Tags users
 // @ID fetch-user
 // @Produce json
 // @Param id path string true "user ID"
@@ -63,6 +65,7 @@ func (h handler) FetchUser(c *gin.Context) {
 
 // AddUser stores a new user
 // @Summary add a new user
+// @Tags users
 // @ID add-user
 // @Produce json
 // @Param data body addUpdateUserBody true "new user data"
@@ -87,6 +90,7 @@ func (h handler) AddUser(c *gin.Context) {
 
 // UpdateUser modifies an existing user
 // @Summary modify an existing user
+// @Tags users
 // @ID update-user
 // @Produce json
 // @Param id path string true "user ID"
@@ -126,6 +130,7 @@ func (h handler) UpdateUser(c *gin.Context) {
 
 // DeleteUser deletes an existing user, including any addresses associated with the user
 // @Summary delete a user by Id, including any addresses associated with the user
+// @Tags users
 // @ID delete-user
 // @Param id path string true "user ID"
 // @Success 204

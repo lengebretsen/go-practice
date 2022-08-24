@@ -6,11 +6,45 @@ definitions:
       message:
         type: string
     type: object
+  controllers.addUpdateAddressBody:
+    properties:
+      city:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      type:
+        type: string
+      userId:
+        type: string
+      zip:
+        type: string
+    required:
+    - userId
+    type: object
   controllers.addUpdateUserBody:
     properties:
       firstName:
         type: string
       lastName:
+        type: string
+    type: object
+  models.Address:
+    properties:
+      city:
+        type: string
+      id:
+        type: string
+      state:
+        type: string
+      street:
+        type: string
+      type:
+        type: string
+      userId:
+        type: string
+      zip:
         type: string
     type: object
   models.User:
@@ -30,6 +64,131 @@ info:
   title: Go + Gin API Practice
   version: "1.0"
 paths:
+  /addresses:
+    get:
+      operationId: fetch-all-addrs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Address'
+            type: array
+      summary: retrieve a list of all addresses in the system
+      tags:
+      - addresses
+    post:
+      operationId: add-addr
+      parameters:
+      - description: new address data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.addUpdateAddressBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Address'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: store a new address
+      tags:
+      - addresses
+  /addresses/{id}:
+    delete:
+      operationId: delete-addr
+      parameters:
+      - description: address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: remove an existing address by Id
+      tags:
+      - addresses
+    get:
+      operationId: fetch-addr
+      parameters:
+      - description: address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Address'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: retrieve an address by Id
+      tags:
+      - addresses
+    put:
+      operationId: update-addr
+      parameters:
+      - description: address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: updated address data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.addUpdateAddressBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Address'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: update an existing address by Id
+      tags:
+      - addresses
   /users:
     get:
       operationId: fetch-all-users
@@ -39,8 +198,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
       summary: retrieve a list of all users in the system
+      tags:
+      - users
     post:
       operationId: add-user
       parameters:
@@ -62,6 +225,8 @@ paths:
           schema:
             $ref: '#/definitions/common.ApiError'
       summary: add a new user
+      tags:
+      - users
   /users/{id}:
     delete:
       operationId: delete-user
@@ -83,6 +248,8 @@ paths:
           schema:
             $ref: '#/definitions/common.ApiError'
       summary: delete a user by Id, including any addresses associated with the user
+      tags:
+      - users
     get:
       operationId: fetch-user
       parameters:
@@ -107,6 +274,8 @@ paths:
           schema:
             $ref: '#/definitions/common.ApiError'
       summary: retrieve a user by Id
+      tags:
+      - users
     put:
       operationId: update-user
       parameters:
@@ -137,4 +306,36 @@ paths:
           schema:
             $ref: '#/definitions/common.ApiError'
       summary: modify an existing user
+      tags:
+      - users
+  /users/{id}/addresses:
+    get:
+      operationId: fetch-addrs-for-user
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Address'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ApiError'
+      summary: retrieve a list of addresses by the user's Id
+      tags:
+      - users
+      - addresses
 swagger: "2.0"

@@ -16,18 +16,24 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users": {
+        "/addresses": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "retrieve a list of all users in the system",
-                "operationId": "fetch-all-users",
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "retrieve a list of all addresses in the system",
+                "operationId": "fetch-all-addrs",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Address"
+                            }
                         }
                     }
                 }
@@ -35,6 +41,198 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "store a new address",
+                "operationId": "add-addr",
+                "parameters": [
+                    {
+                        "description": "new address data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.addUpdateAddressBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Address"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/addresses/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "retrieve an address by Id",
+                "operationId": "fetch-addr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Address"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "update an existing address by Id",
+                "operationId": "update-addr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "updated address data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.addUpdateAddressBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Address"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "remove an existing address by Id",
+                "operationId": "delete-addr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "retrieve a list of all users in the system",
+                "operationId": "fetch-all-users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "add a new user",
                 "operationId": "add-user",
@@ -69,6 +267,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "retrieve a user by Id",
                 "operationId": "fetch-user",
@@ -105,6 +306,9 @@ const docTemplate = `{
             "put": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "modify an existing user",
                 "operationId": "update-user",
@@ -148,6 +352,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "tags": [
+                    "users"
+                ],
                 "summary": "delete a user by Id, including any addresses associated with the user",
                 "operationId": "delete-user",
                 "parameters": [
@@ -177,6 +384,51 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/{id}/addresses": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users",
+                    "addresses"
+                ],
+                "summary": "retrieve a list of addresses by the user's Id",
+                "operationId": "fetch-addrs-for-user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Address"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ApiError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -189,6 +441,32 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.addUpdateAddressBody": {
+            "type": "object",
+            "required": [
+                "userId"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "zip": {
+                    "type": "string"
+                }
+            }
+        },
         "controllers.addUpdateUserBody": {
             "type": "object",
             "properties": {
@@ -196,6 +474,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "lastName": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Address": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "zip": {
                     "type": "string"
                 }
             }
