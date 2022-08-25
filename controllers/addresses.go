@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -55,11 +56,10 @@ func (h handler) FetchAddress(c *gin.Context) {
 
 	addr, err := h.addresses.FetchOneAddress(id)
 	if err != nil {
-		switch e := err.(type) {
-		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: err})
 			return
-		default:
+		} else {
 			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching address record with Id [%s]", id), Error: err})
 			return
 		}
@@ -88,11 +88,10 @@ func (h handler) FetchAddressesForUser(c *gin.Context) {
 	//lookup user to make sure they exist, and send back 404 if they do not
 	_, err = h.users.SelectOneUser(userId)
 	if err != nil {
-		switch e := err.(type) {
-		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: e})
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: err})
 			return
-		default:
+		} else {
 			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching addresses for user with Id [%s]", idParam), Error: err})
 			return
 		}
@@ -168,11 +167,10 @@ func (h handler) UpdateAddress(c *gin.Context) {
 		models.Address{Id: id, UserId: reqBody.UserId, Street: reqBody.Street, City: reqBody.City, State: reqBody.State, Zip: reqBody.Zip, Type: reqBody.Type},
 	)
 	if err != nil {
-		switch e := err.(type) {
-		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: err})
 			return
-		default:
+		} else {
 			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error updating address record with Id [%s]", id), Error: err})
 			return
 		}
@@ -201,11 +199,10 @@ func (h handler) DeleteAddress(c *gin.Context) {
 
 	err = h.addresses.DeleteAddress(id)
 	if err != nil {
-		switch e := err.(type) {
-		case *models.ErrModelNotFound:
-			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: e})
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No address exists with Id [%s]", idParam), Error: err})
 			return
-		default:
+		} else {
 			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error deleting address record with Id [%s]", id), Error: err})
 			return
 		}

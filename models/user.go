@@ -55,7 +55,7 @@ func (m UserModel) SelectOneUser(id uuid.UUID) (User, error) {
 	err := row.Scan(&user.Id, &user.FirstName, &user.LastName)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user, &ErrModelNotFound{ModelName: "User", Id: id}
+			return user, ErrModelNotFound
 		}
 		return user, err
 	}
@@ -87,7 +87,7 @@ func (m UserModel) UpdateUser(usr User) (User, error) {
 		return User{}, err
 	}
 	if count == 0 {
-		return User{}, &ErrModelNotFound{ModelName: "User", Id: usr.Id}
+		return User{}, ErrModelNotFound
 	}
 	return usr, err
 }
@@ -119,7 +119,7 @@ func (m UserModel) DeleteUser(id uuid.UUID) error {
 	}
 	if rows == 0 {
 		tx.Rollback()
-		return &ErrModelNotFound{ModelName: "User", Id: id}
+		return ErrModelNotFound
 	}
 
 	//Commit transaction

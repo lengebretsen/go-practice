@@ -130,7 +130,7 @@ func TestFetchUserRoute(t *testing.T) {
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
-			mockResult:  mockUserRepository{users: []models.User{}, err: &models.ErrModelNotFound{ModelName: "User", Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee")}},
+			mockResult:  mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
 			wantedCode:  404,
 			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
 		},
@@ -259,7 +259,7 @@ func TestUpdateUserRoute(t *testing.T) {
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
-			mockResult:  mockUserRepository{users: []models.User{}, err: &models.ErrModelNotFound{ModelName: "User", Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee")}},
+			mockResult:  mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
 			wantedCode:  404,
 			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
 		},
@@ -322,7 +322,7 @@ func TestDeleteUserRoute(t *testing.T) {
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
-			mockResult:  mockUserRepository{err: &models.ErrModelNotFound{ModelName: "User", Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee")}},
+			mockResult:  mockUserRepository{err: models.ErrModelNotFound},
 			wantedCode:  404,
 			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
 		},

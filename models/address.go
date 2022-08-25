@@ -67,7 +67,7 @@ func (m AddressModel) FetchOneAddress(id uuid.UUID) (Address, error) {
 	err := row.Scan(&addr.Id, &addr.UserId, &addr.Street, &addr.City, &addr.State, &addr.Zip, &addr.Type)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return addr, &ErrModelNotFound{ModelName: "Address", Id: id}
+			return addr, ErrModelNotFound
 		}
 		return addr, err
 	}
@@ -117,7 +117,7 @@ func (m AddressModel) UpdateAddress(addr Address) (Address, error) {
 		return Address{}, err
 	}
 	if count == 0 {
-		return Address{}, &ErrModelNotFound{ModelName: "Address", Id: addr.Id}
+		return Address{}, ErrModelNotFound
 	}
 	return addr, err
 }
@@ -133,7 +133,7 @@ func (m AddressModel) DeleteAddress(id uuid.UUID) error {
 		return err
 	}
 	if count == 0 {
-		return &ErrModelNotFound{ModelName: "Address", Id: id}
+		return ErrModelNotFound
 	}
 	return err
 }
