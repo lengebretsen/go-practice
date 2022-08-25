@@ -12,7 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"github.com/lengebretsen/go-practice/models"
-	"github.com/magiconair/properties/assert"
 )
 
 type mockUserRepository struct {
@@ -52,6 +51,13 @@ func (m *mockUserRepository) UpdateUser(usr models.User) (models.User, error) {
 func (m *mockUserRepository) DeleteUser(id uuid.UUID) error {
 	return m.err
 }
+
+func assertEqual[T any](t *testing.T, actual T, wanted T) {
+	if !cmp.Equal(actual, wanted) {
+		t.Errorf("comparison failed: %s", cmp.Diff(actual, wanted))
+	}
+}
+
 func TestFetchUsersRoute(t *testing.T) {
 	type test struct {
 		mockResult  mockUserRepository
@@ -94,7 +100,7 @@ func TestFetchUsersRoute(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/users/", nil)
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, testCase.wantedCode, w.Code)
+		assertEqual(t, testCase.wantedCode, w.Code)
 
 		if testCase.wantedBody != nil {
 			//Unmarshal json resp into slice of Users
@@ -102,16 +108,12 @@ func TestFetchUsersRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected slice w/ unmarshaled response
-			if !cmp.Equal(parsedResp, testCase.wantedBody) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedBody))
-			}
+			assertEqual(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			if !cmp.Equal(parsedResp, testCase.wantedError) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
-			}
+			assertEqual(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -160,7 +162,7 @@ func TestFetchUserRoute(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/users/"+testCase.userId, nil)
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, testCase.wantedCode, w.Code)
+		assertEqual(t, testCase.wantedCode, w.Code)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -168,16 +170,12 @@ func TestFetchUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			if !cmp.Equal(parsedResp, testCase.wantedBody) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedBody))
-			}
+			assertEqual(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			if !cmp.Equal(parsedResp, testCase.wantedError) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
-			}
+			assertEqual(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -221,7 +219,7 @@ func TestAddUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, w.Code, testCase.wantedCode)
+		assertEqual(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -229,16 +227,12 @@ func TestAddUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			if !cmp.Equal(parsedResp, testCase.wantedBody) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedBody))
-			}
+			assertEqual(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			if !cmp.Equal(parsedResp, testCase.wantedError) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
-			}
+			assertEqual(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -300,7 +294,7 @@ func TestUpdateUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, w.Code, testCase.wantedCode)
+		assertEqual(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -308,16 +302,12 @@ func TestUpdateUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			if !cmp.Equal(parsedResp, testCase.wantedBody) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedBody))
-			}
+			assertEqual(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			if !cmp.Equal(parsedResp, testCase.wantedError) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
-			}
+			assertEqual(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -365,15 +355,13 @@ func TestDeleteUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assert.Equal(t, w.Code, testCase.wantedCode)
+		assertEqual(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedCode != 204 {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			if !cmp.Equal(parsedResp, testCase.wantedError) {
-				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
-			}
+			assertEqual(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
