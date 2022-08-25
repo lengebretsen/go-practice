@@ -9,9 +9,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"github.com/lengebretsen/go-practice/models"
+	"github.com/lengebretsen/go-practice/util/assert"
 )
 
 type mockUserRepository struct {
@@ -50,12 +50,6 @@ func (m *mockUserRepository) UpdateUser(usr models.User) (models.User, error) {
 }
 func (m *mockUserRepository) DeleteUser(id uuid.UUID) error {
 	return m.err
-}
-
-func assertEqual[T any](t *testing.T, actual T, wanted T) {
-	if !cmp.Equal(actual, wanted) {
-		t.Errorf("comparison failed: %s", cmp.Diff(actual, wanted))
-	}
 }
 
 func TestFetchUsersRoute(t *testing.T) {
@@ -100,7 +94,7 @@ func TestFetchUsersRoute(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/users/", nil)
 		router.ServeHTTP(w, req)
 
-		assertEqual(t, testCase.wantedCode, w.Code)
+		assert.Equal(t, testCase.wantedCode, w.Code)
 
 		if testCase.wantedBody != nil {
 			//Unmarshal json resp into slice of Users
@@ -108,12 +102,12 @@ func TestFetchUsersRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected slice w/ unmarshaled response
-			assertEqual(t, parsedResp, testCase.wantedBody)
+			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			assertEqual(t, parsedResp, testCase.wantedError)
+			assert.Equal(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -162,7 +156,7 @@ func TestFetchUserRoute(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/users/"+testCase.userId, nil)
 		router.ServeHTTP(w, req)
 
-		assertEqual(t, testCase.wantedCode, w.Code)
+		assert.Equal(t, testCase.wantedCode, w.Code)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -170,12 +164,12 @@ func TestFetchUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			assertEqual(t, parsedResp, testCase.wantedBody)
+			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			assertEqual(t, parsedResp, testCase.wantedError)
+			assert.Equal(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -219,7 +213,7 @@ func TestAddUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assertEqual(t, w.Code, testCase.wantedCode)
+		assert.Equal(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -227,12 +221,12 @@ func TestAddUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			assertEqual(t, parsedResp, testCase.wantedBody)
+			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			assertEqual(t, parsedResp, testCase.wantedError)
+			assert.Equal(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -294,7 +288,7 @@ func TestUpdateUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assertEqual(t, w.Code, testCase.wantedCode)
+		assert.Equal(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
@@ -302,12 +296,12 @@ func TestUpdateUserRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected User w/ unmarshaled response
-			assertEqual(t, parsedResp, testCase.wantedBody)
+			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			assertEqual(t, parsedResp, testCase.wantedError)
+			assert.Equal(t, parsedResp, testCase.wantedError)
 		}
 	}
 }
@@ -355,13 +349,13 @@ func TestDeleteUserRoute(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(w, req)
 
-		assertEqual(t, w.Code, testCase.wantedCode)
+		assert.Equal(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedCode != 204 {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
-			assertEqual(t, parsedResp, testCase.wantedError)
+			assert.Equal(t, parsedResp, testCase.wantedError)
 		}
 	}
 }

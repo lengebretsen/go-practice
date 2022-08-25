@@ -41,11 +41,13 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/spf13/viper v1.12.0
+require (
+	github.com/google/go-cmp v0.5.8
+	github.com/spf13/viper v1.12.0
+)
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
