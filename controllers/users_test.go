@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -154,6 +155,85 @@ func TestFetchUserRoute(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, testCase.wantedCode, w.Code)
+
+		if testCase.wantedBody != (models.User{}) {
+			//Unmarshal json resp into User
+			parsedResp := models.User{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+
+			//compare expected User w/ unmarshaled response
+			if !cmp.Equal(parsedResp, testCase.wantedBody) {
+				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedBody))
+			}
+		} else {
+			//Unmarshal json resp into ApiError response
+			parsedResp := ApiError{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+			if !cmp.Equal(parsedResp, testCase.wantedError) {
+				t.Errorf("response body did not match: %s", cmp.Diff(parsedResp, testCase.wantedError))
+			}
+		}
+	}
+}
+
+func TestUpdateUserRoute(t *testing.T) {
+	type test struct {
+		userId      string
+		requestBody string
+		mockResult  mockUserRepository
+		wantedCode  int
+		wantedBody  models.User
+		wantedError ApiError
+	}
+
+	tests := []test{
+		{
+			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
+			mockResult:  mockUserRepository{users: []models.User{{Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee"), FirstName: "Updated", LastName: "Name"}}},
+			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
+			wantedCode:  200,
+			wantedBody:  models.User{Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee"), FirstName: "Updated", LastName: "Name"},
+		},
+		{
+			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
+			mockResult:  mockUserRepository{users: []models.User{{Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee"), FirstName: "Updated", LastName: "Name"}}},
+			requestBody: `{"lastName":42}`,
+			wantedCode:  400,
+			wantedError: ApiError{Message: "Invalid request body."},
+		},
+		{
+			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
+			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
+			mockResult:  mockUserRepository{users: []models.User{}, err: &models.ErrModelNotFound{ModelName: "User", Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee")}},
+			wantedCode:  404,
+			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+		},
+		{
+			userId:      "bob",
+			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
+			mockResult:  mockUserRepository{users: []models.User{}, err: nil},
+			wantedCode:  400,
+			wantedError: ApiError{Message: "Id [bob] is not a valid UUID"},
+		},
+		{
+			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
+			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
+			mockResult:  mockUserRepository{users: []models.User{}, err: errors.New("Kaboom!")},
+			wantedCode:  500,
+			wantedError: ApiError{Message: "Error updating user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+		},
+	}
+
+	for _, testCase := range tests {
+		router := SetupRouter()
+		RegisterRoutes(router, &testCase.mockResult, nil)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("PUT", "/users/"+testCase.userId, bytes.NewBuffer([]byte(testCase.requestBody)))
+		req.Header.Set("Content-Type", "application/json")
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, w.Code, testCase.wantedCode)
 
 		if testCase.wantedBody != (models.User{}) {
 			//Unmarshal json resp into User
