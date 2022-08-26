@@ -25,7 +25,11 @@ func (m *mockAddressRepository) FetchAddresses() ([]models.Address, error) {
 	}
 }
 func (m *mockAddressRepository) FetchOneAddress(id uuid.UUID) (models.Address, error) {
-	panic("IMPLEMENT ME")
+	if len(m.addrs) > 0 {
+		return m.addrs[0], nil
+	} else {
+		return models.Address{}, m.err
+	}
 }
 func (m *mockAddressRepository) InsertAddress(models.Address) (models.Address, error) {
 	panic("IMPLEMENT ME")
@@ -117,6 +121,87 @@ func TestFetchAddressesRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected slice w/ unmarshaled response
+			assert.Equal(t, parsedResp, testCase.wantedBody)
+		} else {
+			//Unmarshal json resp into ApiError response
+			parsedResp := ApiError{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+			assert.Equal(t, parsedResp, testCase.wantedErr)
+		}
+	}
+}
+
+func TestFetchSingleAddressRoute(t *testing.T) {
+	type test struct {
+		mockResult mockAddressRepository
+		addrId     string
+		wantedCode int
+		wantedBody models.Address
+		wantedErr  ApiError
+	}
+
+	tests := []test{
+		{
+			mockResult: mockAddressRepository{
+				addrs: []models.Address{
+					{
+						Id:     uuid.MustParse("34ecb0a8-7184-42fa-8840-6fa5c496d161"),
+						UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+						Street: "123 A St.",
+						City:   "Anytown",
+						State:  "GA",
+						Zip:    "30033",
+						Type:   "HOME",
+					},
+				},
+			},
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			wantedCode: 200,
+			wantedBody: models.Address{
+				Id:     uuid.MustParse("34ecb0a8-7184-42fa-8840-6fa5c496d161"),
+				UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+				Street: "123 A St.",
+				City:   "Anytown",
+				State:  "GA",
+				Zip:    "30033",
+				Type:   "HOME",
+			},
+		},
+		{
+			addrId:     "bob",
+			wantedCode: 400,
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+		},
+		{
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			mockResult: mockAddressRepository{err: models.ErrModelNotFound},
+			wantedCode: 404,
+			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+		},
+		{
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
+			wantedCode: 500,
+			wantedErr:  ApiError{Message: "Error fetching address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+		},
+	}
+
+	for _, testCase := range tests {
+		router := SetupRouter()
+		RegisterRoutes(router, nil, &testCase.mockResult)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/addresses/"+testCase.addrId, nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, testCase.wantedCode, w.Code)
+
+		if testCase.wantedBody != (models.Address{}) {
+			//Unmarshal json resp
+			parsedResp := models.Address{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+
+			//compare expected w/ unmarshaled response
 			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response
