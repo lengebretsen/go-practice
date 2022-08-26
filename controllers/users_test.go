@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lengebretsen/go-practice/models"
-	"github.com/lengebretsen/go-practice/util/assert"
+	"github.com/lengebretsen/go-practice/testing/assert"
 )
 
 type mockUserRepository struct {

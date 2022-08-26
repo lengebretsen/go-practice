@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/lengebretsen/go-practice/util/assert"
+	"github.com/lengebretsen/go-practice/testing/assert"
 )
 
 func TestPingRoute(t *testing.T) {
