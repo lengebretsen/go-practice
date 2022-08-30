@@ -21,3 +21,7 @@
 .vscode/settings.json
 
 GINSVR.pid
+
+.vscode/dryrun.log
+
+.vscode/targets.log
