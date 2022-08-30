@@ -23,7 +23,7 @@ func Init() (*sql.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// See "Important settings" section.
+
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
