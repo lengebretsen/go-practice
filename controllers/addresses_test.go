@@ -122,7 +122,7 @@ func TestFetchAddressesRoute(t *testing.T) {
 		{
 			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
 			wantedCode: 500,
-			wantedErr:  ApiError{Message: "Error fetching address records"},
+			wantedErr:  ApiError{Message: "Error fetching address records", Detail: "Kaboom!!"},
 		},
 	}
 
@@ -191,19 +191,19 @@ func TestFetchSingleAddressRoute(t *testing.T) {
 		{
 			addrId:     "bob",
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
 			mockResult: mockAddressRepository{err: models.ErrModelNotFound},
 			wantedCode: 404,
-			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Resource not found"},
 		},
 		{
 			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
 			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
 			wantedCode: 500,
-			wantedErr:  ApiError{Message: "Error fetching address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "Error fetching address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Kaboom!!"},
 		},
 	}
 
@@ -303,26 +303,26 @@ func TestFetchAddresseForUserRoute(t *testing.T) {
 		{
 			userId:     "bob",
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
 			mockUserRepo: mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
 			wantedCode:   404,
-			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]", Detail: "Resource not found"},
 		},
 		{
 			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
 			mockUserRepo: mockUserRepository{users: []models.User{}, err: errors.New("Random error when fetching the user")},
 			wantedCode:   500,
-			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]", Detail: "Random error when fetching the user"},
 		},
 		{
 			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
 			mockResult:   mockAddressRepository{err: errors.New("Kaboom!!")},
 			mockUserRepo: mockUserRepository{users: []models.User{{Id: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"), FirstName: "Test", LastName: "User"}}},
 			wantedCode:   500,
-			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]", Detail: "Kaboom!!"},
 		},
 	}
 
@@ -406,7 +406,7 @@ func TestAddAddressRoute(t *testing.T) {
 				"zip": "30033"
 			  }`,
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Invalid request body."},
+			wantedErr:  ApiError{Message: "Invalid request body.", Detail: "Key: 'addUpdateAddressBody.UserId' Error:Field validation for 'UserId' failed on the 'required' tag"},
 		},
 		{
 			requestBody: `{
@@ -418,7 +418,7 @@ func TestAddAddressRoute(t *testing.T) {
 				"zip": "30033"
 			  }`,
 			wantedCode:   404,
-			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]", Detail: "Resource not found"},
 			mockUserRepo: mockUserRepository{err: models.ErrModelNotFound},
 		},
 		{
@@ -432,7 +432,7 @@ func TestAddAddressRoute(t *testing.T) {
 			  }`,
 			mockResult:   mockAddressRepository{err: errors.New("Kaboom!!")},
 			wantedCode:   500,
-			wantedErr:    ApiError{Message: "Error creating new address"},
+			wantedErr:    ApiError{Message: "Error creating new address", Detail: "Kaboom!!"},
 			mockUserRepo: mockUserRepository{users: []models.User{{Id: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"), FirstName: "Test", LastName: "User"}}},
 		},
 	}
@@ -520,7 +520,7 @@ func TestUpdateAddressRoute(t *testing.T) {
 				"zip": "30033"
 			  }`,
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Invalid request body."},
+			wantedErr:  ApiError{Message: "Invalid request body.", Detail: "Key: 'addUpdateAddressBody.UserId' Error:Field validation for 'UserId' failed on the 'required' tag"},
 		},
 		{
 			addrId: "bob",
@@ -532,7 +532,7 @@ func TestUpdateAddressRoute(t *testing.T) {
 				"zip": "30033"
 			  }`,
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			addrId: "34ecb0a8-7184-42fa-8840-6fa5c496d161",
@@ -546,7 +546,7 @@ func TestUpdateAddressRoute(t *testing.T) {
 			  }`,
 			mockResult: mockAddressRepository{err: models.ErrModelNotFound},
 			wantedCode: 404,
-			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Resource not found"},
 		},
 		{
 			addrId: "34ecb0a8-7184-42fa-8840-6fa5c496d161",
@@ -559,7 +559,7 @@ func TestUpdateAddressRoute(t *testing.T) {
 				"zip": "30033"
 			  }`,
 			wantedCode:   404,
-			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]", Detail: "Resource not found"},
 			mockUserRepo: mockUserRepository{err: models.ErrModelNotFound},
 		},
 		{
@@ -574,7 +574,7 @@ func TestUpdateAddressRoute(t *testing.T) {
 			  }`,
 			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
 			wantedCode: 500,
-			wantedErr:  ApiError{Message: "Error updating address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "Error updating address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Kaboom!!"},
 		},
 	}
 
@@ -622,19 +622,19 @@ func TestDeleteAddressRoute(t *testing.T) {
 		{
 			addrId:     "bob",
 			wantedCode: 400,
-			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
 			mockResult: mockAddressRepository{err: models.ErrModelNotFound},
 			wantedCode: 404,
-			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Resource not found"},
 		},
 		{
 			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
 			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
 			wantedCode: 500,
-			wantedErr:  ApiError{Message: "Error deleting address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+			wantedErr:  ApiError{Message: "Error deleting address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]", Detail: "Kaboom!!"},
 		},
 	}
 

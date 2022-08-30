@@ -82,7 +82,7 @@ func TestFetchUsersRoute(t *testing.T) {
 		{
 			mockResult:  mockUserRepository{users: nil, err: errors.New("Kaboom!")},
 			wantedCode:  500,
-			wantedError: ApiError{Message: "Error fetching user records"},
+			wantedError: ApiError{Message: "Error fetching user records", Detail: "Kaboom!"},
 		},
 	}
 
@@ -132,19 +132,19 @@ func TestFetchUserRoute(t *testing.T) {
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			mockResult:  mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
 			wantedCode:  404,
-			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Resource not found"},
 		},
 		{
 			userId:      "bob",
 			mockResult:  mockUserRepository{users: []models.User{}, err: nil},
 			wantedCode:  400,
-			wantedError: ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedError: ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			mockResult:  mockUserRepository{users: []models.User{}, err: errors.New("Kaboom!")},
 			wantedCode:  500,
-			wantedError: ApiError{Message: "Error fetching user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "Error fetching user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Kaboom!"},
 		},
 	}
 
@@ -194,13 +194,13 @@ func TestAddUserRoute(t *testing.T) {
 			mockResult:  mockUserRepository{users: []models.User{{Id: uuid.MustParse("493adb28-9da1-4db8-893d-73cc2d7bd4ee")}}},
 			requestBody: `{"lastName":42}`,
 			wantedCode:  400,
-			wantedError: ApiError{Message: "Invalid request body."},
+			wantedError: ApiError{Message: "Invalid request body.", Detail: "json: cannot unmarshal number into Go struct field addUpdateUserBody.lastName of type string"},
 		},
 		{
 			requestBody: `{"firstName":"New", "lastName":"Guy"}`,
 			mockResult:  mockUserRepository{users: []models.User{}, err: errors.New("Kaboom!")},
 			wantedCode:  500,
-			wantedError: ApiError{Message: "Error creating new user"},
+			wantedError: ApiError{Message: "Error creating new user", Detail: "Kaboom!"},
 		},
 	}
 
@@ -254,28 +254,28 @@ func TestUpdateUserRoute(t *testing.T) {
 			mockResult:  mockUserRepository{users: []models.User{}},
 			requestBody: `{"lastName":42}`,
 			wantedCode:  400,
-			wantedError: ApiError{Message: "Invalid request body."},
+			wantedError: ApiError{Message: "Invalid request body.", Detail: "json: cannot unmarshal number into Go struct field addUpdateUserBody.lastName of type string"},
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
 			mockResult:  mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
 			wantedCode:  404,
-			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Resource not found"},
 		},
 		{
 			userId:      "bob",
 			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
 			mockResult:  mockUserRepository{users: []models.User{}, err: nil},
 			wantedCode:  400,
-			wantedError: ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedError: ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			requestBody: `{"firstName":"Updated", "lastName":"Name"}`,
 			mockResult:  mockUserRepository{users: []models.User{}, err: errors.New("Kaboom!")},
 			wantedCode:  500,
-			wantedError: ApiError{Message: "Error updating user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "Error updating user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Kaboom!"},
 		},
 	}
 
@@ -324,19 +324,19 @@ func TestDeleteUserRoute(t *testing.T) {
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			mockResult:  mockUserRepository{err: models.ErrModelNotFound},
 			wantedCode:  404,
-			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "No user exists with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Resource not found"},
 		},
 		{
 			userId:      "bob",
 			mockResult:  mockUserRepository{users: []models.User{}, err: nil},
 			wantedCode:  400,
-			wantedError: ApiError{Message: "Id [bob] is not a valid UUID"},
+			wantedError: ApiError{Message: "Id [bob] is not a valid UUID", Detail: "invalid UUID length: 3"},
 		},
 		{
 			userId:      "493adb28-9da1-4db8-893d-73cc2d7bd4ee",
 			mockResult:  mockUserRepository{users: []models.User{}, err: errors.New("Kaboom!")},
 			wantedCode:  500,
-			wantedError: ApiError{Message: "Error deleting user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]"},
+			wantedError: ApiError{Message: "Error deleting user record with Id [493adb28-9da1-4db8-893d-73cc2d7bd4ee]", Detail: "Kaboom!"},
 		},
 	}
 

@@ -2,7 +2,8 @@ basePath: /
 definitions:
   controllers.ApiError:
     properties:
-      error: {}
+      detail:
+        type: string
       message:
         type: string
     type: object

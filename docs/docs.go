@@ -441,7 +441,9 @@ const docTemplate = `{
         "controllers.ApiError": {
             "type": "object",
             "properties": {
-                "error": {},
+                "detail": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 }
