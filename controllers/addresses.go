@@ -113,14 +113,29 @@ func (h handler) FetchAddressesForUser(c *gin.Context) {
 // @Param data body addUpdateAddressBody true "new address data"
 // @Success 200 {object} []models.Address
 // @Failure 400 {object} ApiError
+// @Failure 404 {object} ApiError
 // @Router /addresses [post]
 func (h handler) AddAddress(c *gin.Context) {
 	var reqBody addUpdateAddressBody
 
-	if err := c.BindJSON(&reqBody); err != nil {
+	err := c.BindJSON(&reqBody)
+	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
 	}
+
+	//lookup user to make sure they exist, and send back 404 if they do not
+	_, err = h.users.SelectOneUser(reqBody.UserId)
+	if err != nil {
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", reqBody.UserId), Error: err})
+			return
+		} else {
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: "Error creating new address", Error: err})
+			return
+		}
+	}
+
 	newAddr, err := h.addresses.InsertAddress(models.Address{
 		Id:     uuid.New(),
 		UserId: reqBody.UserId,
@@ -158,9 +173,22 @@ func (h handler) UpdateAddress(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&reqBody); err != nil {
+	err = c.BindJSON(&reqBody)
+	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, ApiError{Message: "Invalid request body.", Error: err})
 		return
+	}
+
+	//lookup user to make sure they exist, and send back 404 if they do not
+	_, err = h.users.SelectOneUser(reqBody.UserId)
+	if err != nil {
+		if errors.Is(err, models.ErrModelNotFound) {
+			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", reqBody.UserId), Error: err})
+			return
+		} else {
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error updating address record with Id [%s]", id), Error: err})
+			return
+		}
 	}
 
 	updatedAddr, err := h.addresses.UpdateAddress(

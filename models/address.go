@@ -25,8 +25,8 @@ type AddressModel struct {
 type AddressRepository interface {
 	FetchAddresses() ([]Address, error)
 	FetchOneAddress(id uuid.UUID) (Address, error)
-	InsertAddress(Address) (Address, error)
-	UpdateAddress(Address) (Address, error)
+	InsertAddress(addr Address) (Address, error)
+	UpdateAddress(addr Address) (Address, error)
 	DeleteAddress(id uuid.UUID) error
 	FindAddressesByUserId(userId uuid.UUID) ([]Address, error)
 }

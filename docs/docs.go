@@ -71,7 +71,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -106,13 +112,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -157,13 +163,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -193,13 +199,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -257,7 +263,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -292,13 +298,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -340,13 +346,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -373,13 +379,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -418,13 +424,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/common.ApiError"
+                            "$ref": "#/definitions/controllers.ApiError"
                         }
                     }
                 }
@@ -432,7 +438,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "common.ApiError": {
+        "controllers.ApiError": {
             "type": "object",
             "properties": {
                 "error": {},

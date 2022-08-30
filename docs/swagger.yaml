@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  common.ApiError:
+  controllers.ApiError:
     properties:
       error: {}
       message:
@@ -100,7 +100,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controllers.ApiError'
       summary: store a new address
       tags:
       - addresses
@@ -121,11 +125,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: remove an existing address by Id
       tags:
       - addresses
@@ -147,11 +151,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: retrieve an address by Id
       tags:
       - addresses
@@ -181,11 +185,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: update an existing address by Id
       tags:
       - addresses
@@ -223,7 +227,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: add a new user
       tags:
       - users
@@ -242,11 +246,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: delete a user by Id, including any addresses associated with the user
       tags:
       - users
@@ -268,11 +272,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: retrieve a user by Id
       tags:
       - users
@@ -300,11 +304,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: modify an existing user
       tags:
       - users
@@ -329,11 +333,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/common.ApiError'
+            $ref: '#/definitions/controllers.ApiError'
       summary: retrieve a list of addresses by the user's Id
       tags:
       - users
