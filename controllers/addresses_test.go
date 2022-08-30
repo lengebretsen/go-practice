@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,7 +42,11 @@ func (m *mockAddressRepository) DeleteAddress(id uuid.UUID) error {
 	panic("IMPLEMENT ME")
 }
 func (m *mockAddressRepository) FindAddressesByUserId(userId uuid.UUID) ([]models.Address, error) {
-	panic("IMPLEMENT ME")
+	if m.addrs != nil {
+		return m.addrs, nil
+	} else {
+		return nil, m.err
+	}
 }
 
 func TestFetchAddressesRoute(t *testing.T) {
@@ -202,6 +207,125 @@ func TestFetchSingleAddressRoute(t *testing.T) {
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
 
 			//compare expected w/ unmarshaled response
+			assert.Equal(t, parsedResp, testCase.wantedBody)
+		} else {
+			//Unmarshal json resp into ApiError response
+			parsedResp := ApiError{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+			assert.Equal(t, parsedResp, testCase.wantedErr)
+		}
+	}
+}
+
+func TestFetchAddresseForUserRoute(t *testing.T) {
+	type test struct {
+		userId       string
+		mockResult   mockAddressRepository
+		mockUserRepo mockUserRepository
+		wantedCode   int
+		wantedBody   []models.Address
+		wantedErr    ApiError
+	}
+
+	tests := []test{
+		{
+			userId: "80e4de8a-91c4-46cc-a66d-23d3cf364036",
+			mockResult: mockAddressRepository{
+				addrs: []models.Address{
+					{
+						Id:     uuid.MustParse("34ecb0a8-7184-42fa-8840-6fa5c496d161"),
+						UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+						Street: "123 A St.",
+						City:   "Anytown",
+						State:  "GA",
+						Zip:    "30033",
+						Type:   "HOME",
+					},
+					{
+						Id:     uuid.MustParse("160ded2d-3074-417f-9bc1-a0d44a403cf2"),
+						UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+						Street: "456 B St.",
+						City:   "Anothertown",
+						State:  "TN",
+						Zip:    "38028",
+						Type:   "WORK",
+					},
+				},
+			},
+			mockUserRepo: mockUserRepository{users: []models.User{{Id: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"), FirstName: "Test", LastName: "User"}}},
+			wantedCode:   200,
+			wantedBody: []models.Address{
+				{
+					Id:     uuid.MustParse("34ecb0a8-7184-42fa-8840-6fa5c496d161"),
+					UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+					Street: "123 A St.",
+					City:   "Anytown",
+					State:  "GA",
+					Zip:    "30033",
+					Type:   "HOME",
+				},
+				{
+					Id:     uuid.MustParse("160ded2d-3074-417f-9bc1-a0d44a403cf2"),
+					UserId: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"),
+					Street: "456 B St.",
+					City:   "Anothertown",
+					State:  "TN",
+					Zip:    "38028",
+					Type:   "WORK",
+				},
+			},
+		},
+		{
+			userId: "80e4de8a-91c4-46cc-a66d-23d3cf364036",
+			mockResult: mockAddressRepository{
+				addrs: []models.Address{},
+			},
+			mockUserRepo: mockUserRepository{users: []models.User{{Id: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"), FirstName: "Test", LastName: "User"}}},
+			wantedCode:   200,
+			wantedBody:   []models.Address{},
+		},
+		{
+			userId:     "bob",
+			wantedCode: 400,
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+		},
+		{
+			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
+			mockUserRepo: mockUserRepository{users: []models.User{}, err: models.ErrModelNotFound},
+			wantedCode:   404,
+			wantedErr:    ApiError{Message: "No user exists with Id [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+		},
+		{
+			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
+			mockUserRepo: mockUserRepository{users: []models.User{}, err: errors.New("Random error when fetching the user")},
+			wantedCode:   500,
+			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+		},
+		{
+			userId:       "80e4de8a-91c4-46cc-a66d-23d3cf364036",
+			mockResult:   mockAddressRepository{err: errors.New("Kaboom!!")},
+			mockUserRepo: mockUserRepository{users: []models.User{{Id: uuid.MustParse("80e4de8a-91c4-46cc-a66d-23d3cf364036"), FirstName: "Test", LastName: "User"}}},
+			wantedCode:   500,
+			wantedErr:    ApiError{Message: "Error fetching address records for user [80e4de8a-91c4-46cc-a66d-23d3cf364036]"},
+		},
+	}
+
+	for _, testCase := range tests {
+		router := SetupRouter()
+		RegisterRoutes(router, &testCase.mockUserRepo, &testCase.mockResult)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/users/%s/addresses", testCase.userId), nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, testCase.wantedCode, w.Code)
+
+		if testCase.wantedBody != nil {
+			//Unmarshal json resp
+			parsedResp := []models.Address{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+
+			//compare expected slice w/ unmarshaled response
 			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
 			//Unmarshal json resp into ApiError response

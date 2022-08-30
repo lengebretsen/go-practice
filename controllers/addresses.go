@@ -92,7 +92,7 @@ func (h handler) FetchAddressesForUser(c *gin.Context) {
 			c.IndentedJSON(http.StatusNotFound, ApiError{Message: fmt.Sprintf("No user exists with Id [%s]", idParam), Error: err})
 			return
 		} else {
-			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching addresses for user with Id [%s]", idParam), Error: err})
+			c.IndentedJSON(http.StatusInternalServerError, ApiError{Message: fmt.Sprintf("Error fetching address records for user [%s]", idParam), Error: err})
 			return
 		}
 	}
