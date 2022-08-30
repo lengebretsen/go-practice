@@ -55,7 +55,7 @@ func (m *mockAddressRepository) UpdateAddress(addr models.Address) (models.Addre
 	}
 }
 func (m *mockAddressRepository) DeleteAddress(id uuid.UUID) error {
-	panic("IMPLEMENT ME")
+	return m.err
 }
 func (m *mockAddressRepository) FindAddressesByUserId(userId uuid.UUID) ([]models.Address, error) {
 	if m.addrs != nil {
@@ -597,6 +597,58 @@ func TestUpdateAddressRoute(t *testing.T) {
 			//compare expected w/ unmarshaled response
 			assert.Equal(t, parsedResp, testCase.wantedBody)
 		} else {
+			//Unmarshal json resp into ApiError response
+			parsedResp := ApiError{}
+			json.Unmarshal(w.Body.Bytes(), &parsedResp)
+			assert.Equal(t, parsedResp, testCase.wantedErr)
+		}
+	}
+}
+
+func TestDeleteAddressRoute(t *testing.T) {
+	type test struct {
+		addrId     string
+		mockResult mockAddressRepository
+		wantedCode int
+		wantedErr  ApiError
+	}
+
+	tests := []test{
+		{
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			mockResult: mockAddressRepository{},
+			wantedCode: 204,
+		},
+		{
+			addrId:     "bob",
+			wantedCode: 400,
+			wantedErr:  ApiError{Message: "Id [bob] is not a valid UUID"},
+		},
+		{
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			mockResult: mockAddressRepository{err: models.ErrModelNotFound},
+			wantedCode: 404,
+			wantedErr:  ApiError{Message: "No address exists with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+		},
+		{
+			addrId:     "34ecb0a8-7184-42fa-8840-6fa5c496d161",
+			mockResult: mockAddressRepository{err: errors.New("Kaboom!!")},
+			wantedCode: 500,
+			wantedErr:  ApiError{Message: "Error deleting address record with Id [34ecb0a8-7184-42fa-8840-6fa5c496d161]"},
+		},
+	}
+
+	for _, testCase := range tests {
+		router := SetupRouter()
+		RegisterRoutes(router, nil, &testCase.mockResult)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("DELETE", "/addresses/"+testCase.addrId, nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, testCase.wantedCode, w.Code)
+
+		if testCase.wantedCode != 204 {
 			//Unmarshal json resp into ApiError response
 			parsedResp := ApiError{}
 			json.Unmarshal(w.Body.Bytes(), &parsedResp)
