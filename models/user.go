@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -72,7 +71,7 @@ func (m UserModel) InsertUser(usr User) (User, error) {
 		return User{}, err
 	}
 	if count != 1 {
-		return User{}, errors.New(fmt.Sprintf("Invalid number of rows written: %d", count))
+		return User{}, fmt.Errorf("invalid number of rows written: %d", count)
 	}
 	return usr, err
 }

@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -93,7 +92,7 @@ func (m AddressModel) InsertAddress(addr Address) (Address, error) {
 		return Address{}, err
 	}
 	if count != 1 {
-		return Address{}, errors.New(fmt.Sprintf("Invalid number of rows written: %d", count))
+		return Address{}, fmt.Errorf("invalid number of rows written: %d", count)
 	}
 	return addr, err
 }
