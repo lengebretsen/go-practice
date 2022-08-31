@@ -123,7 +123,7 @@ func (m AddressModel) UpdateAddress(addr Address) (Address, error) {
 }
 
 func (m AddressModel) DeleteAddress(id uuid.UUID) error {
-	result, err := m.DB.Exec("DELETE FROM addresses WHERE Id = UUID_TO_BIN(?)")
+	result, err := m.DB.Exec("DELETE FROM addresses WHERE Id = UUID_TO_BIN(?)", id)
 	if err != nil {
 		return err
 	}
